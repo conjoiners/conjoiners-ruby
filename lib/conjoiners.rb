@@ -112,13 +112,12 @@ module Conjoiners
     def connect_to_conjoiners(ctx, o, conf, name, vars)
       for c in conf["conjoiners"] do
         if c["name"] != name
-          url = c["url"].clone
-          Thread.new do
+          Thread.new(c["url"]) do |url|
             sub_sock = ctx.socket(ZMQ::SUB)
             sub_sock.setsockopt(ZMQ::LINGER, 1)
             sub_sock.setsockopt(ZMQ::SUBSCRIBE,'')
             sub_sock.connect(url)
-          
+
             while true
               payload = ''
               sub_sock.recv_string(payload)
