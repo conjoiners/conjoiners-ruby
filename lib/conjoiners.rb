@@ -84,21 +84,19 @@ module Conjoiners
       for symbol in o.class.public_instance_methods(false)
         n = symbol.to_s
         if n =~ /.*=$/
-          next
+          # retrieve original setter in order to call it afterwards
+          m = o.method(n)
+          var_name = n[0..-2]
+          overrideSetter(metaclass, self, var_name, m, con, name)
+          vars[var_name] = m
         end
-
-        # retrieve original setter in order to call it afterwards
-        m = o.method(n + "=")
-        overrideSetter(metaclass, self, n, m, con, name)
-
-        vars[n] = m
       end
       return vars
     end
 
     private
     def overrideSetter(metaclass, implanter, n, method, con, name)
-        metaclass.send(:define_method, n + "=") do | v |
+        metaclass.send(:define_method, method.name) do | v |
           # publish new value
           con.send_string(implanter.pack_payload_single(name, n, v), ZMQ::NonBlocking)
 
