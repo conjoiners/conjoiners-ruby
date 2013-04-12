@@ -14,8 +14,8 @@ class TestReact < Test::Unit::TestCase
   def setup
     @cj1 = Test.new
     @cj2 = Test.new
-    Conjoiners::implant(@cj1, "./conf_react.json", "test")
-    Conjoiners::implant(@cj2, "./conf_react.json", "test2")
+    Conjoiners::implant(@cj1, "test/conf_react.json", "test")
+    Conjoiners::implant(@cj2, "test/conf_react.json", "test2")
   end
 
   def test_send

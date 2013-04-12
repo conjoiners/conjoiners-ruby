@@ -10,8 +10,8 @@ class TestConjoiner < Test::Unit::TestCase
   def setup
     @cj1 = Conjoiner.new
     @cj2 = Conjoiner.new
-    Conjoiners::implant(@cj1, "./conf_conjoiner.json", "test")
-    Conjoiners::implant(@cj2, "./conf_conjoiner.json", "test2")
+    Conjoiners::implant(@cj1, "test/conf_conjoiner.json", "test")
+    Conjoiners::implant(@cj2, "test/conf_conjoiner.json", "test2")
   end
 
   def test_send

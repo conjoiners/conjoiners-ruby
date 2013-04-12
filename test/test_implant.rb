@@ -1,5 +1,5 @@
 require 'test/unit'
-require '../lib/conjoiners.rb'
+require 'conjoiners'
 
 class TestImplant < Test::Unit::TestCase
 
@@ -10,7 +10,7 @@ class TestImplant < Test::Unit::TestCase
   def setup
     @iyes = Test.new
     @ino = Test.new
-    Conjoiners::implant(@iyes, "./conf_implant.json", "test_implant")
+    Conjoiners::implant(@iyes, "test/conf_implant.json", "test_implant")
   end
 
   def test_no_implant
