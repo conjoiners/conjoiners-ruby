@@ -35,7 +35,7 @@ module Conjoiners
       url = my_url(conf, name)
       con = bind_external(ctx, o, url)
       vars = hook_instance_variables(con, o, name)
-      connect_to_conjoiners(ctx, o, conf, name, vars)
+      connect_to_conjoiners(ctx, conf, name, vars)
     end
 
     # bind to the external url
@@ -107,24 +107,29 @@ module Conjoiners
 
     # connect to other conjoiners
     private
-    def connect_to_conjoiners(ctx, o, conf, name, vars)
+    def connect_to_conjoiners(ctx, conf, name, vars)
       for c in conf["conjoiners"] do
         if c["name"] != name
-          Thread.new(c["url"]) do |url|
-            sub_sock = ctx.socket(ZMQ::SUB)
-            sub_sock.setsockopt(ZMQ::LINGER, 1)
-            sub_sock.setsockopt(ZMQ::SUBSCRIBE,'')
-            sub_sock.connect(url)
-
+          sub_sock = ctx.socket(ZMQ::SUB)
+          sub_sock.setsockopt(ZMQ::LINGER, 1)
+          sub_sock.setsockopt(ZMQ::SUBSCRIBE,'')
+          sub_sock.connect(c["url"])
+          Thread.new(sub_sock) do |con|
             while true
-              payload = ''
-              sub_sock.recv_string(payload)
-              nv = unpack_payload_single(payload)
-              vars[nv[0]].call(nv[1])
+              recv_from_conjoiner(con, vars)
             end
           end
         end
       end
+    end
+
+    # recv next payload
+    private
+    def recv_from_conjoiner(con, vars)
+      payload = ''
+      con.recv_string(payload)
+      nv = unpack_payload_single(payload)
+      vars[nv[0]].call(nv[1])
     end
 
     private
