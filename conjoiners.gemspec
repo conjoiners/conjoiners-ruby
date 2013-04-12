@@ -9,4 +9,5 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'ffi-rzmq', '~> 1.0.0'
   s.add_dependency 'json', '>= 1.7.7'
+  s.add_development_dependency 'rake', '~> 10.0.4'
 end
