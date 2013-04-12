@@ -35,7 +35,7 @@ module Conjoiners
       url = my_url(conf, name)
       con = bind_external(ctx, o, url)
       vars = hook_instance_variables(con, o, name)
-      connect_to_conjoiners(ctx, conf, name, vars)
+      connect_to_conjoiners(ctx, o, conf, name, vars)
     end
 
     # bind to the external url
@@ -58,7 +58,7 @@ module Conjoiners
 
     # pack payload as json, e.g. in order to send it
     def pack_payload_single(name, n, v)
-      return "{\"sender\": \"" + name + "\", \"time\": \"" + Time.now.to_i.to_s + "\", \"" + key_n(n) + "\": \"" + v + "\"}"
+      return "{\"sender\": \"" + name + "\", \"time\": \"" + Time.now.to_i.to_s + "\", \"" + key_n(n) + "\": \"" + v.to_s + "\"}"
     end
 
     # unpack name and value from payload
@@ -107,16 +107,16 @@ module Conjoiners
 
     # connect to other conjoiners
     private
-    def connect_to_conjoiners(ctx, conf, name, vars)
+    def connect_to_conjoiners(ctx, o, conf, name, vars)
       for c in conf["conjoiners"] do
         if c["name"] != name
           sub_sock = ctx.socket(ZMQ::SUB)
           sub_sock.setsockopt(ZMQ::LINGER, 1)
           sub_sock.setsockopt(ZMQ::SUBSCRIBE,'')
           sub_sock.connect(c["url"])
-          Thread.new(sub_sock) do |con|
+          Thread.new(o, sub_sock) do |o, con|
             while true
-              recv_from_conjoiner(con, vars)
+              recv_from_conjoiner(o, con, vars)
             end
           end
         end
@@ -125,11 +125,22 @@ module Conjoiners
 
     # recv next payload
     private
-    def recv_from_conjoiner(con, vars)
+    def recv_from_conjoiner(o, con, vars)
       payload = ''
       con.recv_string(payload)
       nv = unpack_payload_single(payload)
       vars[nv[0]].call(nv[1])
+
+      # enable any sort of reaction on data change
+      react(o)
+    end
+
+    # allow conjoined object to react on transenlightenments
+    private
+    def react(o)
+      if o.class.method_defined? :onTransenlightenment
+        o.onTransenlightenment
+      end
     end
 
     private
