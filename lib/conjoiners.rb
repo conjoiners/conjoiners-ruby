@@ -165,12 +165,11 @@ module Conjoiners
 
   end
 
+  @implanter = Implanter.new
+
   def self.implant(o, cfg_file, my_name)
     json = File.read(cfg_file)
     conf = JSON.parse(json)
-    if !@implanter
-      @implanter = Implanter.new
-    end
     @implanter.implant(o, conf, my_name)
   end
 
