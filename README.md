@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/conjoiners/conjoiners-ruby.png?branch=master)](https://travis-ci.org/conjoiners/conjoiners-ruby)
+
 # conjoiners - multi-platform / multi-language reactive programming library
 
 conjoiners is a library aiming to enable reactive programming for
@@ -37,9 +39,9 @@ yet. Libraries like EventMachine could help to enable real parallel computation.
 
 This library brings ffi-rzmq and json as dependency.
 
-To run the tests, first install the dependencies using gem install, afterwards run the
-tests within the test directory.
+To run the tests, first install the dependencies and rake using gem install,
+afterwards run rake.
     
     gem install ffi-rzmq
     gem install json
-    ruby test_conjoiner.rb
+    rake
